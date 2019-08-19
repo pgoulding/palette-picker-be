@@ -10,3 +10,10 @@ app.set('port', process.env.PORT || 3000)
 app.listen(app.get('port'), () => {
   console.log(`Listening on port ${app.get('port')}`)
 })
+
+app.locals.title = 'pallete picker'
+
+app.get('/api/v1/projects', (req, res) => {
+  const { title } = app.locals
+  res.status(200).json({title})
+})
