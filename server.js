@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const environment = process.env.NODE_ENV || 'development';
+const configuration = require('./knexfile')[environment];
+const dbConnect = require('knex')(configuration);
 require('dotenv').config()
 app.use(express.json());
 app.use(cors())
@@ -19,7 +22,15 @@ app.get('/', (req, res) => {
 })
 // GETS
 app.get('/api/v1/projects', (req, res) => {
-
+  dbConnect('projects')
+  .select('*')
+  .then(projects => {
+    if (!projects.length) {
+      return res.status(404).send("Cannot find any projects at this time.")
+    };
+    res.status(200).json(projects)
+  })
+  .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
 })
 
 app.get('/api/v1/palettes', (req, res) => {
@@ -27,7 +38,16 @@ app.get('/api/v1/palettes', (req, res) => {
 })
 
 app.get('/api/v1/projects/:id', (req, res) => {
-
+  dbConnect('projects')
+  .where({ id:  req.params.id})
+  .first()
+  .then(project => {
+    if (!project) {
+      return res.status(404).send(`Project ID# ${req.params.id} could not be found.`)
+    };
+    res.status(200).json(project)
+  })
+  .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
 })
 
 app.get('/api/v1/palettes/:id', (req, res) => {
