@@ -1,9 +1,9 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const environment = process.env.NODE_ENV || 'development';
-const configuration = require('./knexfile')[environment];
-const dbConnect = require('knex')(configuration);
+const environment = process.env.NODE_ENV || 'development'
+const configuration = require('./knexfile')[environment]
+const dbConnect = require('knex')(configuration)
 require('dotenv').config()
 app.use(express.json());
 app.use(cors())
@@ -34,7 +34,9 @@ app.get('/api/v1/projects', (req, res) => {
 })
 
 app.get('/api/v1/palettes', (req, res) => {
-
+  dbConnect('palettes')
+    .select('*')
+    .then(result => res.status(200).json(result))
 })
 
 app.get('/api/v1/projects/:id', (req, res) => {
@@ -51,7 +53,22 @@ app.get('/api/v1/projects/:id', (req, res) => {
 })
 
 app.get('/api/v1/palettes/:id', (req, res) => {
-
+  const { id } = req.params
+  dbConnect('palettes')
+    .where({id})
+    .first()
+    .then(palette => {
+      if(!palette) {
+        res.status(404).send(`Palette id ${id} Not Found`)
+      }
+      res.status(200).json(palette)
+    })
+    .catch(error => res.status(404).json(
+        { 
+        error: error.message, 
+        stack: error.stack 
+      }
+    ))
 })
 
 //POSTS
