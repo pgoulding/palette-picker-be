@@ -61,7 +61,25 @@ app.post('/api/v1/projects', (req, res) => {
 })
 
 app.post('/api/v1/palettes', (req, res) => {
+  const pallete = req.body
 
+  for (let requiredParameter of ['name','color_1', 'color_2', 'color_3', 'color_4', 'color_5', 'project_id']) {
+    if (!req.body[requiredParameter]) {
+      return res
+        .status(422)
+        .send({ error: `You're missing a "${requiredParameter}" property.` });
+    };
+  };
+
+  dbConnect('palettes')
+    .insert(pallete, 'id')
+    .then(result => {
+      if(!result) {
+        res.status(422).send(`Missing Content`)
+      }
+        res.status(201).send(`Pallete id ${result} created sucessfully.`)
+    })
+    .catch(error => res.status(404).send(`Error creating pallete: ${error.message}`))
 })
 
 //PUTS
@@ -81,7 +99,7 @@ app.delete('/api/v1/projects/:id', (req, res) => {
 })
 
 app.delete('/api/v1/palettes/:id', (req, res) => {
-
+  
 })
 
 //CUSTOM QUERY PARAM
