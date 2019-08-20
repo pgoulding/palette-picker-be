@@ -1,7 +1,7 @@
 
 exports.up = function(knex) {
   return Promise.all([
-    knex.shema.createTable('projects', table => {
+    knex.schema.createTable('projects', table => {
       table.increments('id').primary()
       table.string('name')
       table.timestamps(true, true)
@@ -9,7 +9,6 @@ exports.up = function(knex) {
     knex.schema.createTable('palettes', table => {
       table.increments('id').primary()
       table.string('name')
-      table.string('project_name')
       table.string('color_1')
       table.string('color_2')
       table.string('color_3')
