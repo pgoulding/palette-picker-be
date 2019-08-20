@@ -26,7 +26,7 @@ app.get('/api/v1/projects', (req, res) => {
   .select('*')
   .then(projects => {
     if (!projects.length) {
-      return res.status(404).send("Cannot find any projects at this time.")
+      return res.status(404).send("Cannot find any Projects at this time.")
     };
     res.status(200).json(projects)
   })
@@ -36,12 +36,19 @@ app.get('/api/v1/projects', (req, res) => {
 app.get('/api/v1/palettes', (req, res) => {
   dbConnect('palettes')
     .select('*')
-    .then(result => res.status(200).json(result))
+    .then(palettes => {
+      if(!palettes.length) {
+        return res.status(404).send("Cannot find any Palettes at this time.")
+      }
+      res.status(200).json(palettes)
+    })
+    .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
 })
 
 app.get('/api/v1/projects/:id', (req, res) => {
+  const { id } = req.params
   dbConnect('projects')
-  .where({ id:  req.params.id})
+  .where({ id })
   .first()
   .then(project => {
     if (!project) {
@@ -49,21 +56,26 @@ app.get('/api/v1/projects/:id', (req, res) => {
     };
     res.status(200).json(project)
   })
-  .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
+  .catch(error => res.status(500).json(
+      { 
+      error: error.message, 
+      stack: error.stack 
+      }
+    ))
 })
 
 app.get('/api/v1/palettes/:id', (req, res) => {
   const { id } = req.params
   dbConnect('palettes')
-    .where({id})
+    .where({ id })
     .first()
     .then(palette => {
       if(!palette) {
-        res.status(404).send(`Palette id ${id} Not Found`)
+        res.status(404).send(`Project ID# ${ id } could not be found.`)
       }
       res.status(200).json(palette)
     })
-    .catch(error => res.status(404).json(
+    .catch(error => res.status(500).json(
         { 
         error: error.message, 
         stack: error.stack 
@@ -80,16 +92,15 @@ app.post('/api/v1/projects', (req, res) => {
       .send(`You're missing a "NAME" property.`);
   };
 
-  const project = {
-    name: req.body.name
-  }
+  const project = req.body
 
-  dbConnect('projects').insert(project, 'id')
-    .then(id => {
-      if (!id) {
-        res.status(404).send('ID was not returned from database, your submission may or may not have been successful.')
+  dbConnect('projects')
+    .insert(project, 'id')
+    .then(projectId => {
+      if (!projectId) {
+        res.status(404).send('New Project ID was not returned from database, your submission may or may not have been successful.')
       }
-      res.status(201).json({ id: project[0] })
+      res.status(201).json({ id: project[0], message:'New Project creation successful'})
     })
     .catch(error => {
       res.status(500).json({ error: error.message, stack: error.stack })
@@ -97,28 +108,30 @@ app.post('/api/v1/projects', (req, res) => {
 });
 
 app.post('/api/v1/palettes', (req, res) => {
-  const pallete = req.body
-
   for (let requiredParameter of ['name','color_1', 'color_2', 'color_3', 'color_4', 'color_5', 'project_id']) {
     if (!req.body[requiredParameter]) {
       return res
-        .status(422)
-        .send({ error: `You're missing a "${requiredParameter}" property.` });
+      .status(422)
+      .send({ error: `You're missing a "${requiredParameter}" property.` });
     };
   };
 
+  const pallete = req.body
+  
   dbConnect('palettes')
     .insert(pallete, 'id')
-    .then(result => {
-      if(!result) {
-        res.status(422).send(`Missing Content`)
+    .then(paletteId => {
+      if(!paletteId) {
+        res.status(404).send('New Palette ID was not returned from database, your submission may or may not have been successful.')
       }
-        res.status(201).send(`Pallete id ${result} created sucessfully.`)
+      res.status(201).json({ id: pallete[0], message: 'New Palette creation successful' })
     })
-    .catch(error => res.status(404).send(`Error creating pallete: ${error.message}`))
+    .catch(error => {
+      res.status(500).json({ error: error.message, stack: error.stack })
+    })
 })
 
-//PUTS
+//PATCH
 
 app.patch('/api/v1/projects/:id', (req, res) => {
   const { id } = req.params
@@ -126,42 +139,62 @@ app.patch('/api/v1/projects/:id', (req, res) => {
   dbConnect('projects')
     .where({ id })
     .update({ ...updates })
-    .then(projectId => res.status(202).send(`Project id: ${projectId} has been updated`))
-    .catch(error => res.send(`Error: ${error.message}`))
+    .then(projectId => res.status(202).send(`Project ID# ${projectId} has been updated`))
+    .catch(error => res.status(500).json(
+      {
+        error: error.message,
+        stack: error.stack
+      }
+    ))
 })
 
 app.patch('/api/v1/palettes/:id', (req, res) => {
   const { id } = req.params
   const updates = req.body
   dbConnect('palettes')
-    .where({id})
-    .update({...updates})
-    .then(result => res.status(202).send(`Palette id: ${result} has been updated`))
-    .catch(error => res.send(`Error: ${error.message}`))
+    .where({ id })
+    .update({ ...updates })
+    .then(paletteId => res.status(202).send(`Palette ID# ${paletteId} has been updated`))
+    .catch(error => res.status(500).json(
+      {
+        error: error.message,
+        stack: error.stack
+      }
+    ))
 })
 
 //DELETES
 
 app.delete('/api/v1/projects/:id', (req, res) => {
-  const requestId = req.params.id;
+  const { id }= req.params;
   dbConnect('projects')
-    .where({ id: requestId })
+    .where({ id })
     .del()
     .then(() => res.status(202).json({ 
-      message: `Project ${requestId} has been deleted.`
+      message: `Project ID# ${id} has been deleted.`
     }))
-    .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
+    .catch(error => res.status(500).json(
+      {
+        error: error.message,
+        stack: error.stack
+      }
+    ))
 });
 
 app.delete('/api/v1/palettes/:id', (req, res) => {
-  const requestId = req.params.id;
+  const { id } = req.params;
   dbConnect('palettes')
-    .where({ id: requestId })
+    .where({ id })
     .del()
     .then(() => res.status(202).json({ 
-      message: `Palette ${requestId} has been deleted.`
+      message: `Palette ID# ${id} has been deleted.`
     }))
-    .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
+    .catch(error => res.status(500).json(
+      {
+        error: error.message,
+        stack: error.stack
+      }
+    ))
 });
 
 //CUSTOM QUERY PARAM
