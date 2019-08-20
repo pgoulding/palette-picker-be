@@ -1,4 +1,4 @@
-const projects = require('./mockProjects')
+const projects = require('../mockProjects')
 
 const createProject = (knex, project) => {
   return (
@@ -31,7 +31,7 @@ exports.seed = function(knex) {
     .then( () => {
       let projectsPromises = []
       projects.forEach(project => {
-        projectsPromises.push(project)
+        projectsPromises.push(createProject(knex, project))
       }) 
       return Promise.all(projectsPromises)
     })
