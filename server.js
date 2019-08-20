@@ -84,12 +84,24 @@ app.post('/api/v1/palettes', (req, res) => {
 
 //PUTS
 
-app.put('/api/v1/projects/:id', (req, res) => {
-
+app.patch('/api/v1/projects/:id', (req, res) => {
+  const { id } = req.params
+  const updates = req.body
+  dbConnect('projects')
+    .where({ id })
+    .update({ ...updates })
+    .then(projectId => res.status(202).send(`Project id: ${projectId} has been updated`))
+    .catch(error => res.send(`Error: ${error.message}`))
 })
 
-app.put('/api/v1/palettes/:id', (req, res) => {
-
+app.patch('/api/v1/palettes/:id', (req, res) => {
+  const { id } = req.params
+  const updates = req.body
+  dbConnect('palettes')
+    .where({id})
+    .update({...updates})
+    .then(result => res.status(202).send(`Palette id: ${result} has been updated`))
+    .catch(error => res.send(`Error: ${error.message}`))
 })
 
 //DELETES
@@ -99,7 +111,7 @@ app.delete('/api/v1/projects/:id', (req, res) => {
 })
 
 app.delete('/api/v1/palettes/:id', (req, res) => {
-  
+
 })
 
 //CUSTOM QUERY PARAM
