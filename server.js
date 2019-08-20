@@ -74,8 +74,27 @@ app.get('/api/v1/palettes/:id', (req, res) => {
 //POSTS
 
 app.post('/api/v1/projects', (req, res) => {
+  if (!req.body['name']) {
+    return res 
+      .status(422)
+      .send(`You're missing a "NAME" property.`);
+  };
 
-})
+  const project = {
+    name: req.body.name
+  }
+
+  dbConnect('projects').insert(project, 'id')
+    .then(id => {
+      if (!id) {
+        res.status(404).send('ID was not returned from database, your submission may or may not have been successful.')
+      }
+      res.status(201).json({ id: project[0] })
+    })
+    .catch(error => {
+      res.status(500).json({ error: error.message, stack: error.stack })
+    })
+});
 
 app.post('/api/v1/palettes', (req, res) => {
 
@@ -94,11 +113,25 @@ app.put('/api/v1/palettes/:id', (req, res) => {
 //DELETES
 
 app.delete('/api/v1/projects/:id', (req, res) => {
-
-})
+  const requestId = req.params.id;
+  dbConnect('projects')
+    .where({ id: requestId })
+    .del()
+    .then(() => res.status(202).json({ 
+      message: `Project ${requestId} has been deleted.`
+    }))
+    .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
+});
 
 app.delete('/api/v1/palettes/:id', (req, res) => {
-
-})
+  const requestId = req.params.id;
+  dbConnect('palettes')
+    .where({ id: requestId })
+    .del()
+    .then(() => res.status(202).json({ 
+      message: `Palette ${requestId} has been deleted.`
+    }))
+    .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
+});
 
 //CUSTOM QUERY PARAM
