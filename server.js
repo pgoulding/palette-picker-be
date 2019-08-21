@@ -51,16 +51,24 @@ app.get('/api/v1/projects/:id', (req, res) => {
   .where({ id })
   .first()
   .then(project => {
-    if (!project) {
-      return res.status(404).send(`Project ID# ${req.params.id} could not be found.`)
-    };
-    res.status(200).json(project)
+    dbConnect
+      .select('*')
+      .from('projects')
+      .joinRaw('natural full join palettes')
+      .where('project_id', id)
+      .then(palette => ({...project, palette}))
+      .then(project => {
+        if (!project) {
+          return res.status(404).send(`Project ID# ${req.params.id} could not be found.`)
+        };
+        res.status(200).json(project)
+      })
   })
-  .catch(error => res.status(500).json(
-      { 
-      error: error.message, 
-      stack: error.stack 
-      }
+    .catch(error => res.status(500).json(
+        { 
+        error: error.message, 
+        stack: error.stack 
+        }
     ))
 })
 
