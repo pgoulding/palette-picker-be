@@ -5,6 +5,6 @@ test:
   adapter: postgresql
   database: palette_picker_test
 before_script:
-  -psql -c "CREATE DATABASE palette_picker_test" -U postgres
+  -psql /c "CREATE DATABASE palette_picker_test" -U postgres
   -knex migrate:latest --env=test
   -knex seed:run --env=test
