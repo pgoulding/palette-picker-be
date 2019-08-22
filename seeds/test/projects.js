@@ -10,7 +10,7 @@ const createProject = (knex, project) => {
       let palettePromises = []
 
       project.palettes.forEach(palette => {
-        palettePromises.push(createPalette(knex, { ...palette, project_id: projectId[0] }))
+        palettePromises.push(createPalette(knex, {...palette, project_id:projectId[0]}))
       })
 
       return Promise.all(palettePromises)
@@ -19,22 +19,20 @@ const createProject = (knex, project) => {
   )
 }
 
-const createPalette = (knex, palette) => {
+const createPalette =(knex, palette) => {
   return (
     knex('palettes').insert(palette)
   )
 }
 
-exports.seed = function (knex) {
+exports.seed = function(knex) {
   return knex('palettes').del()
-    .then(() => {
-      knex('projects').del()
-    })
-    .then(() => {
+    .then(knex('projects').del())
+    .then( () => {
       let projectsPromises = []
       projects.forEach(project => {
         projectsPromises.push(createProject(knex, project))
-      })
+      }) 
       return Promise.all(projectsPromises)
     })
     .catch(error => console.error(`Error seeding data: ${error}`))
