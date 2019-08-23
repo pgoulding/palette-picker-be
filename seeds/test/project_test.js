@@ -30,6 +30,10 @@ exports.seed = function (knex) {
     .then(() => {
       knex('projects').del()
     })
+    .then( async() => {
+      await knex.raw("TRUNCATE TABLE palettes RESTART IDENTITY CASCADE");
+      await knex.raw("TRUNCATE TABLE projects RESTART IDENTITY CASCADE");
+    })
     .then(() => {
       let projectsPromises = []
       projects.forEach(project => {
@@ -39,3 +43,5 @@ exports.seed = function (knex) {
     })
     .catch(error => console.error(`Error seeding data: ${error}`))
 };
+
+"TRUNCATE TABLE palettes RESTART IDENTITY CASCADE"

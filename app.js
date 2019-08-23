@@ -56,7 +56,7 @@ app.get('/api/v1/projects/:id', (req, res) => {
         .where('project_id', id)
         .then(palette => ({ ...project, palette }))
         .then(project => {
-          if (!project) {
+          if (!project.id) {
             return res.status(404).send(`Project ID# ${req.params.id} could not be found.`)
           };
           res.status(200).json(project)
@@ -106,7 +106,7 @@ app.post('/api/v1/projects', (req, res) => {
       if (!projectId) {
         res.status(404).send('New Project ID was not returned from database, your submission may or may not have been successful.')
       }
-      res.status(201).json({ id: project[0], message: 'New Project creation successful' })
+      res.status(201).json({ id: projectId, message: 'New Project creation successful' })
     })
     .catch(error => {
       res.status(500).json({ error: error.message, stack: error.stack })
@@ -130,7 +130,7 @@ app.post('/api/v1/palettes', (req, res) => {
       if (!paletteId) {
         res.status(404).send('New Palette ID was not returned from database, your submission may or may not have been successful.')
       }
-      res.status(201).json({ id: pallete[0], message: 'New Palette creation successful' })
+      res.status(201).json({ id: paletteId, message: 'New Palette creation successful' })
     })
     .catch(error => {
       res.status(500).json({ error: error.message, stack: error.stack })
@@ -145,14 +145,19 @@ app.patch('/api/v1/projects/:id', (req, res) => {
   dbConnect('projects')
     .where({ id })
     .update({ ...updates })
-    .then(projectId => res.status(202).send(`Project ID# ${projectId} has been updated`))
+    .then(projectId => {
+      if (!projectId) {
+        return res.status(404).send(`Project ID# ${id} does not exist.`)
+      }
+      res.status(202).send(`Project ID# ${projectId} has been updated`)
+    })
     .catch(error => res.status(500).json(
       {
         error: error.message,
         stack: error.stack
       }
     ))
-})
+});
 
 app.patch('/api/v1/palettes/:id', (req, res) => {
   const { id } = req.params
@@ -160,14 +165,19 @@ app.patch('/api/v1/palettes/:id', (req, res) => {
   dbConnect('palettes')
     .where({ id })
     .update({ ...updates })
-    .then(paletteId => res.status(202).send(`Palette ID# ${paletteId} has been updated`))
+    .then(paletteId => {
+      if (!paletteId) {
+        return res.status(404).send(`Palette ID# ${id} does not exist.`)
+      }
+      res.status(202).send(`Palette ID# ${paletteId} has been updated`)
+    })
     .catch(error => res.status(500).json(
       {
         error: error.message,
         stack: error.stack
       }
     ))
-})
+});
 
 //DELETES
 
@@ -176,9 +186,12 @@ app.delete('/api/v1/projects/:id', (req, res) => {
   dbConnect('projects')
     .where({ id })
     .del()
-    .then(() => res.status(202).json({
-      message: `Project ID# ${id} has been deleted.`
-    }))
+    .then(projectID => {
+      if(!projectID) {
+        res.status(404).send(`Project ID# ${id} does not exist.`)
+      }
+      res.status(202).send(`Project ID# ${id} has been deleted.`)
+    })
     .catch(error => res.status(500).json(
       {
         error: error.message,
@@ -192,9 +205,12 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
   dbConnect('palettes')
     .where({ id })
     .del()
-    .then(() => res.status(202).json({
-      message: `Palette ID# ${id} has been deleted.`
-    }))
+    .then(palleteID => {
+      if(!palleteID) {
+        res.status(404).send(`Palette ID# ${id} does not exist.`)
+      }
+      res.status(202).send(`Palette ID# ${id} has been deleted.`)
+    })
     .catch(error => res.status(500).json(
       {
         error: error.message,
