@@ -17,6 +17,8 @@ exports.up = function(knex) {
       table.integer('project_id').unsigned()
       table.foreign('project_id')
         .references('projects.id')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE')
       table.timestamps(true, true)
     })
   ])
@@ -25,6 +27,6 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   return Promise.all([
     knex.schema.dropTable('palettes'),
-    knex.shcema.dropTable('projects')
+    knex.schema.dropTable('projects')
   ])
 };
