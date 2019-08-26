@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --forceExit",
-    "devTest":"jest --watchAll",
+    "devTest": "jest --watchAll",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
@@ -26,6 +26,7 @@
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
     "babel-jest": "^24.5.0",
+    "coveralls": "^3.0.6",
     "nodemon": "^1.19.1"
   },
   "description": ""
