@@ -6,7 +6,8 @@
     "test": "jest --forceExit",
     "devTest": "jest --watchAll",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "coveralls": "jest --coverage && cat ./tests/coverage/lcov.info | coveralls"
   },
   "keywords": [],
   "author": "",
