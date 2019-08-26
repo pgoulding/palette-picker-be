@@ -190,7 +190,7 @@ app.delete('/api/v1/projects/:id', (req, res) => {
       if(!projectID) {
         res.status(404).send(`Project ID# ${id} does not exist.`)
       }
-      res.status(202).send(`Project ID# ${id} has been deleted.`)
+      res.status(202).send(`Project ID# ${projectID} has been deleted.`)
     })
     .catch(error => res.status(500).json(
       {

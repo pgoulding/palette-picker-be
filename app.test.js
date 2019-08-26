@@ -196,21 +196,26 @@ describe('Server', () => {
     });
   });
   describe('DELETE /api/v1/projects', () => {
+
     beforeEach(async () => {
       await database.seed.run()
     });
+
     it('HAPPY should delete a project if the ID is found', async () => {
       const res = await request(app)
         .delete('/api/v1/projects/1')
       expect(res.status).toEqual(202)
       expect(res.text).toEqual('Project ID# 1 has been deleted.')
     })
+
+
     it('SAD: Should send an error if the id doesnt exist', async ()=> {
       const res = await request(app)
       .delete('/api/v1/projects/112')
     expect(res.status).toEqual(404)
     expect(res.text).toEqual('Project ID# 112 does not exist.')
     })
+
   })
   describe('DELETE /api/v1/palettes', () => {
     beforeEach(async () => {
