@@ -128,7 +128,7 @@ app.post('/api/v1/palettes', (req, res) => {
     .insert(pallete, 'id')
     .then(paletteId => {
       if (!paletteId) {
-        res.status(404).send('New Palette ID was not returned from database, your submission may or may not have been successful.')
+        return res.status(404).send('New Palette ID was not returned from database, your submission may or may not have been successful.')
       }
       res.status(201).json({ id: paletteId, message: 'New Palette creation successful' })
     })
@@ -188,7 +188,7 @@ app.delete('/api/v1/projects/:id', (req, res) => {
     .del()
     .then(projectID => {
       if(!projectID) {
-        res.status(404).send(`Project ID# ${id} does not exist.`)
+        return res.status(404).send(`Project ID# ${id} does not exist.`)
       }
       res.status(202).send(`Project ID# ${projectID} has been deleted.`)
     })
@@ -207,7 +207,7 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
     .del()
     .then(palleteID => {
       if(!palleteID) {
-        res.status(404).send(`Palette ID# ${id} does not exist.`)
+        return res.status(404).send(`Palette ID# ${id} does not exist.`)
       }
       res.status(202).send(`Palette ID# ${id} has been deleted.`)
     })
