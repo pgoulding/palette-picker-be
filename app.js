@@ -24,7 +24,7 @@ app.get('/api/v1/projects', (req, res) => {
     .select('*')
     .then(projects => {
       if (!projects.length) {
-        return res.status(404).send("Cannot find any Projects at this time.")
+        return res.status(404).json({message: "Cannot find any Projects at this time."})
       };
       res.status(200).json(projects)
     })
@@ -36,7 +36,7 @@ app.get('/api/v1/palettes', (req, res) => {
     .select('*')
     .then(palettes => {
       if (!palettes.length) {
-        return res.status(404).send("Cannot find any Palettes at this time.")
+        return res.status(404).json({message: "Cannot find any Palettes at this time."})
       }
       res.status(200).json(palettes)
     })
@@ -57,7 +57,7 @@ app.get('/api/v1/projects/:id', (req, res) => {
         .then(palette => ({ ...project, palette }))
         .then(project => {
           if (!project.id) {
-            return res.status(404).send(`Project ID# ${req.params.id} could not be found.`)
+            return res.status(404).json({message:`Project ID# ${req.params.id} could not be found.`})
           };
           res.status(200).json(project)
         })
@@ -77,7 +77,7 @@ app.get('/api/v1/palettes/:id', (req, res) => {
     .first()
     .then(palette => {
       if (!palette) {
-        res.status(404).send(`Project ID# ${id} could not be found.`)
+        res.status(404).json({message:`Project ID# ${id} could not be found.`})
       }
       res.status(200).json(palette)
     })
@@ -188,9 +188,9 @@ app.delete('/api/v1/projects/:id', (req, res) => {
     .del()
     .then(projectID => {
       if(!projectID) {
-        res.status(404).send(`Project ID# ${id} does not exist.`)
+        res.status(404).json({message:`Project ID# ${id} does not exist.`})
       }
-      res.status(202).send(`Project ID# ${id} has been deleted.`)
+      res.status(202).json({message:`Project ID# ${id} has been deleted.`})
     })
     .catch(error => res.status(500).json(
       {
@@ -207,9 +207,9 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
     .del()
     .then(palleteID => {
       if(!palleteID) {
-        res.status(404).send(`Palette ID# ${id} does not exist.`)
+        res.status(404).json({message:`Palette ID# ${id} does not exist.`})
       }
-      res.status(202).send(`Palette ID# ${id} has been deleted.`)
+      res.status(202).json({message:`Palette ID# ${id} has been deleted.`})
     })
     .catch(error => res.status(500).json(
       {
