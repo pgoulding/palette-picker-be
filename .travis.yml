@@ -9,3 +9,9 @@ before_script:
   - psql -c 'CREATE DATABASE palette_picker_test;' -U postgres
   - knex migrate:latest --env=test
   - knex seed:run --env=test
+before_install:
+- npm update
+install:
+- npm install
+script:
+- npm test

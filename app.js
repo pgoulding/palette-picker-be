@@ -128,7 +128,7 @@ app.post('/api/v1/palettes', (req, res) => {
     .insert(pallete, 'id')
     .then(paletteId => {
       if (!paletteId) {
-        res.status(404).send('New Palette ID was not returned from database, your submission may or may not have been successful.')
+        return res.status(404).send('New Palette ID was not returned from database, your submission may or may not have been successful.')
       }
       res.status(201).json({ id: paletteId, message: 'New Palette creation successful' })
     })
