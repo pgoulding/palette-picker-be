@@ -167,7 +167,8 @@ app.patch('/api/v1/palettes/:id', (req, res) => {
     .update({ ...updates })
     .then(paletteId => {
       if (!paletteId) {
-        return res.status(404).json({message:`Palette ID\#\ \${id}\ does not exist.`})
+        return res.status(404).json({ message:`Palette ID\#\ \${id}\ does not exist.`
+        })
       }
       res.status(202).json({message:`Palette ID\#\ \${paletteId}\ has been updated`})
     })
@@ -188,9 +189,15 @@ app.delete('/api/v1/projects/:id', (req, res) => {
     .del()
     .then(projectID => {
       if(!projectID) {
-        res.status(404).json({message:`Project ID# ${id} does not exist.`})
+        res.status(404).json({
+          deleted:false,
+          message:`Project ID# ${id} does not exist.`
+        })
       }
-      res.status(202).json({message:`Project ID# ${id} has been deleted.`})
+      res.status(202).json({
+        deleted:true,
+        message:`Project ID# ${id} has been deleted.`
+      })
     })
     .catch(error => res.status(500).json(
       {
@@ -207,9 +214,15 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
     .del()
     .then(palleteID => {
       if(!palleteID) {
-        res.status(404).json({message:`Palette ID# ${id} does not exist.`})
+        res.status(404).json({
+          deleted: false,
+          message:`Palette ID# ${id} does not exist.`
+        })
       }
-      res.status(202).json({message:`Palette ID# ${id} has been deleted.`})
+      res.status(202).json({
+        deleted:true,
+        message:`Palette ID# ${id} has been deleted.`
+      })
     })
     .catch(error => res.status(500).json(
       {
