@@ -147,9 +147,9 @@ app.patch('/api/v1/projects/:id', (req, res) => {
     .update({ ...updates })
     .then(projectId => {
       if (!projectId) {
-        return res.status(404).send(`Project ID# ${id} does not exist.`)
+        return res.status(404).json({message:`Project ID\# ${id} does not exist.`})
       }
-      res.status(202).send(`Project ID# ${projectId} has been updated`)
+      res.status(202).json({message:`Project ID# ${projectId} has been updated`})
     })
     .catch(error => res.status(500).json(
       {
@@ -167,9 +167,9 @@ app.patch('/api/v1/palettes/:id', (req, res) => {
     .update({ ...updates })
     .then(paletteId => {
       if (!paletteId) {
-        return res.status(404).send(`Palette ID# ${id} does not exist.`)
+        return res.status(404).json({message:`Palette ID\#\ \${id}\ does not exist.`})
       }
-      res.status(202).send(`Palette ID# ${paletteId} has been updated`)
+      res.status(202).json({message:`Palette ID\#\ \${paletteId}\ has been updated`})
     })
     .catch(error => res.status(500).json(
       {
