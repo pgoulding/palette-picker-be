@@ -104,9 +104,15 @@ app.post('/api/v1/projects', (req, res) => {
     .insert(project, 'id')
     .then(projectId => {
       if (!projectId) {
-        res.status(404).send('New Project ID was not returned from database, your submission may or may not have been successful.')
+        res.status(404).json({
+          message:'New Project ID was not returned from database, your submission may or may not have been successful.'
+        })
       }
-      res.status(201).json({ id: projectId, message: 'New Project creation successful' })
+      res.status(201).json({ 
+        id: projectId[0], 
+        ...project,
+        message: 'New Project creation successful' 
+      })
     })
     .catch(error => {
       res.status(500).json({ error: error.message, stack: error.stack })
@@ -122,15 +128,19 @@ app.post('/api/v1/palettes', (req, res) => {
     };
   };
 
-  const pallete = req.body
+  const palette = req.body
 
   dbConnect('palettes')
-    .insert(pallete, 'id')
+    .insert(palette, 'id')
     .then(paletteId => {
       if (!paletteId) {
         return res.status(404).send('New Palette ID was not returned from database, your submission may or may not have been successful.')
       }
-      res.status(201).json({ id: paletteId, message: 'New Palette creation successful' })
+      res.status(201).json({ 
+        id: paletteId[0], 
+        name:palette.name,
+        message: 'New Palette creation successful' 
+      })
     })
     .catch(error => {
       res.status(500).json({ error: error.message, stack: error.stack })

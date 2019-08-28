@@ -44,4 +44,4 @@ exports.seed = function (knex) {
     .catch(error => console.error(`Error seeding data: ${error}`))
 };
 
-"TRUNCATE TABLE palettes RESTART IDENTITY CASCADE"
+// "TRUNCATE TABLE palettes RESTART IDENTITY CASCADE"

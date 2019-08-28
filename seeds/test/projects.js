@@ -27,12 +27,14 @@ const createPalette =(knex, palette) => {
 
 exports.seed = function(knex) {
   return knex('palettes').del()
-    .then(() => knex('projects').del())
+    .then(() => {
+      knex('projects').del()
+    })
     .then( async() => {
       await knex.raw("TRUNCATE TABLE palettes RESTART IDENTITY CASCADE");
       await knex.raw("TRUNCATE TABLE projects RESTART IDENTITY CASCADE");
     })
-    .then( () => {
+    .then(() => {
       let projectsPromises = []
       projects.forEach(project => {
         projectsPromises.push(createProject(knex, project))
