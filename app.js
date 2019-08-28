@@ -265,7 +265,7 @@ app.patch('/api/v1/palettes/:id', (req, res) => {
       res.status(202).json(
         {
           patched: true,
-          ...id,
+          id,
           message:`Palette ID# ${paletteId} has been updated`
         }
       )
@@ -289,14 +289,14 @@ app.delete('/api/v1/projects/:id', (req, res) => {
       if(!projectID) {
         return res.status(404).json({
           deleted:false,
-          ...id,
+          "id":parseInt(id),
           message:`Project ID# ${id} does not exist.`
         })
       }
       res.status(202).json(
         {
           deleted:true,
-          ...id,
+          "id": parseInt(id),
           message:`Project ID# ${id} has been deleted.`
         }
       )
@@ -319,7 +319,7 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
         return res.status(404).json(
           {
             deleted: false,
-            id,
+            "id":parseInt(id),
             message:`Palette ID# ${id} does not exist.`
           }
         )
@@ -327,7 +327,7 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
       res.status(202).json(
         {
           deleted:true,
-          id,
+          "id":parseInt(id),
           message:`Palette ID# ${id} has been deleted.`
         }
       )
