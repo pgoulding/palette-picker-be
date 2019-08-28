@@ -84,6 +84,14 @@ describe('Server', () => {
   describe('POST /projects', () => {
 
     it('HAPPY: Should post new project to the database', async () => {
+      
+      const expectedBody = {
+        posted:true,
+        id:4,
+        name: 'Trendy Sandwhich Shop',
+        message: 'New Project creation successful' 
+      }
+
       const newProject = { name: 'Trendy Sandwhich Shop' }
       const res = await request(app)
         .post('/api/v1/projects')
@@ -91,8 +99,11 @@ describe('Server', () => {
         const projects = await database('projects').where('id', parseInt(res.body.id)).select()
         const project = projects[0]
         expect(res.status).toBe(201)
+        expect(res.body).toEqual(expectedBody)
         expect(project.name).toEqual(newProject.name)
     });
+
+
 
     it('SAD: Should return an error if the name property is missing', async () => {
       const newProject = { name: '' }
@@ -302,10 +313,6 @@ describe('Server', () => {
       const res = await request(app)
         .delete('/api/v1/palettes/112')
       expect(res.body.message).toEqual('Palette ID# 112 does not exist.')
-    })
-
-    it('SAD: Should send a 500 error', async () => {
-
     })
 
   })
