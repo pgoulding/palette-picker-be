@@ -235,6 +235,7 @@ app.patch('/api/v1/projects/:id', (req, res) => {
       res.status(202).json(
         {
           patched:true,
+          ...updates,
           message:`Project ID# ${projectId} has been updated`
         }
       )
