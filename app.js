@@ -12,7 +12,7 @@ app.use(cors())
 app.use(bodyParser.json())
 app.set('port', process.env.PORT || 3000)
 
-app.locals.title = 'pallete picker'
+app.locals.title = 'palette picker'
 
 app.get('/', (req, res) => {
   const { title } = app.locals
@@ -77,7 +77,7 @@ app.get('/api/v1/palettes/:id', (req, res) => {
     .first()
     .then(palette => {
       if (!palette) {
-        res.status(404).json({message:`Project ID# ${id} could not be found.`})
+        return res.status(404).json({message:`Project ID# ${id} could not be found.`})
       }
       res.status(200).json(palette)
     })
@@ -95,7 +95,7 @@ app.post('/api/v1/projects', (req, res) => {
   if (!req.body['name']) {
     return res
       .status(422)
-      .send(`You're missing a "NAME" property.`);
+      .json({message:`You're missing a "NAME" property.`});
   };
 
   const project = req.body
@@ -104,7 +104,7 @@ app.post('/api/v1/projects', (req, res) => {
     .insert(project, 'id')
     .then(projectId => {
       if (!projectId) {
-        res.status(404).json({
+        return res.status(404).json({
           message:'New Project ID was not returned from database, your submission may or may not have been successful.'
         })
       }
@@ -124,7 +124,7 @@ app.post('/api/v1/palettes', (req, res) => {
     if (!req.body[requiredParameter]) {
       return res
         .status(422)
-        .send({ error: `You're missing a "${requiredParameter}" property.` });
+        .json({ error: `You're missing a "${requiredParameter}" property.` });
     };
   };
 
@@ -134,7 +134,9 @@ app.post('/api/v1/palettes', (req, res) => {
     .insert(palette, 'id')
     .then(paletteId => {
       if (!paletteId) {
-        return res.status(404).send('New Palette ID was not returned from database, your submission may or may not have been successful.')
+        return res.status(404).json({
+          message:'New Palette ID was not returned from database, your submission may or may not have been successful.',
+        })
       }
       res.status(201).json({ 
         id: paletteId[0], 
@@ -157,7 +159,7 @@ app.patch('/api/v1/projects/:id', (req, res) => {
     .update({ ...updates })
     .then(projectId => {
       if (!projectId) {
-        return res.status(404).json({message:`Project ID\# ${id} does not exist.`})
+        return res.status(404).json({message:`Project ID# ${id} does not exist.`})
       }
       res.status(202).json({message:`Project ID# ${projectId} has been updated`})
     })
@@ -177,10 +179,10 @@ app.patch('/api/v1/palettes/:id', (req, res) => {
     .update({ ...updates })
     .then(paletteId => {
       if (!paletteId) {
-        return res.status(404).json({ message:`Palette ID\#\ \${id}\ does not exist.`
+        return res.status(404).json({ message:`Palette ID# ${id}  does not exist.`
         })
       }
-      res.status(202).json({message:`Palette ID\#\ \${paletteId}\ has been updated`})
+      res.status(202).json({message:`Palette ID# ${paletteId} has been updated`})
     })
     .catch(error => res.status(500).json(
       {
@@ -199,13 +201,15 @@ app.delete('/api/v1/projects/:id', (req, res) => {
     .del()
     .then(projectID => {
       if(!projectID) {
-        res.status(404).json({
+        return res.status(404).json({
           deleted:false,
+          id,
           message:`Project ID# ${id} does not exist.`
         })
       }
       res.status(202).json({
         deleted:true,
+        id,
         message:`Project ID# ${id} has been deleted.`
       })
     })
@@ -222,15 +226,17 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
   dbConnect('palettes')
     .where({ id })
     .del()
-    .then(palleteID => {
-      if(!palleteID) {
-        res.status(404).json({
+    .then(paletteID => {
+      if(!paletteID) {
+        return res.status(404).json({
           deleted: false,
+          id,
           message:`Palette ID# ${id} does not exist.`
         })
       }
       res.status(202).json({
         deleted:true,
+        id,
         message:`Palette ID# ${id} has been deleted.`
       })
     })
