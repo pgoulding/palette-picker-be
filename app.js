@@ -12,23 +12,34 @@ app.use(cors())
 app.use(bodyParser.json())
 app.set('port', process.env.PORT || 3000)
 
-app.locals.title = 'palette picker'
+app.locals.title = 'Palette Picker'
+
+// GETS
 
 app.get('/', (req, res) => {
   const { title } = app.locals
   res.status(200).send(`${title} is running on port ${app.get('port')}`)
 })
-// GETS
+
 app.get('/api/v1/projects', (req, res) => {
   dbConnect('projects')
     .select('*')
     .then(projects => {
       if (!projects.length) {
-        return res.status(404).json({message: "Cannot find any Projects at this time."})
+        return res.status(404).json(
+          {
+            message: "Cannot find any Projects at this time."
+          }
+        )
       };
       res.status(200).json(projects)
     })
-    .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
+    .catch(error => res.status(500).json(
+      { 
+        error: error.message, 
+        stack: error.stack 
+      }
+    ))
 })
 
 app.get('/api/v1/palettes', (req, res) => {
@@ -36,11 +47,20 @@ app.get('/api/v1/palettes', (req, res) => {
     .select('*')
     .then(palettes => {
       if (!palettes.length) {
-        return res.status(404).json({message: "Cannot find any Palettes at this time."})
+        return res.status(404).json(
+          {
+            message: "Cannot find any Palettes at this time."
+          }
+        )
       }
       res.status(200).json(palettes)
     })
-    .catch(error => res.status(500).json({ error: error.message, stack: error.stack }))
+    .catch(error => res.status(500).json(
+      { 
+        error: error.message, 
+        stack: error.stack 
+      }
+    ))
 })
 
 app.get('/api/v1/projects/:id', (req, res) => {
@@ -54,10 +74,19 @@ app.get('/api/v1/projects/:id', (req, res) => {
         .from('projects')
         .joinRaw('natural full join palettes')
         .where('project_id', id)
-        .then(palette => ({ ...project, palette }))
+        .then(palette => (
+          { 
+            ...project, 
+            palette 
+          }
+        ))
         .then(project => {
           if (!project.id) {
-            return res.status(404).json({message:`Project ID# ${req.params.id} could not be found.`})
+            return res.status(404).json(
+              {
+                message:`Project ID# ${req.params.id} could not be found.`
+              }
+            )
           };
           res.status(200).json(project)
         })
@@ -77,7 +106,11 @@ app.get('/api/v1/palettes/:id', (req, res) => {
     .first()
     .then(palette => {
       if (!palette) {
-        return res.status(404).json({message:`Project ID# ${id} could not be found.`})
+        return res.status(404).json(
+          {
+          message:`Project ID# ${id} could not be found.`
+          }
+        )
       }
       res.status(200).json(palette)
     })
@@ -95,7 +128,11 @@ app.post('/api/v1/projects', (req, res) => {
   if (!req.body['name']) {
     return res
       .status(422)
-      .json({message:`You're missing a "NAME" property.`});
+      .json(
+        {
+          message:`You're missing a "NAME" property.`
+        }
+      );
   };
 
   const project = req.body
@@ -104,27 +141,45 @@ app.post('/api/v1/projects', (req, res) => {
     .insert(project, 'id')
     .then(projectId => {
       if (!projectId) {
-        return res.status(404).json({
-          message:'New Project ID was not returned from database, your submission may or may not have been successful.'
-        })
+        return res.status(404).json(
+          {
+            posted:false,
+            message:'New Project ID was not returned from database, your submission may or may not have been successful.'
+          }
+        )
       }
-      res.status(201).json({ 
-        id: projectId[0], 
-        ...project,
-        message: 'New Project creation successful' 
-      })
+      res.status(201).json(
+        { 
+          posted:true,
+          id: projectId[0], 
+          ...project,
+          message: 'New Project creation successful' 
+        }
+      )
     })
     .catch(error => {
-      res.status(500).json({ error: error.message, stack: error.stack })
+      res.status(500).json(
+        {
+          error: error.message, 
+          stack: error.stack 
+        }
+      )
     })
 });
 
 app.post('/api/v1/palettes', (req, res) => {
   for (let requiredParameter of ['name', 'color_1', 'color_2', 'color_3', 'color_4', 'color_5', 'project_id']) {
+    
     if (!req.body[requiredParameter]) {
       return res
         .status(422)
-        .json({ error: `You're missing a "${requiredParameter}" property.` });
+        .json(
+          { 
+            posted: false,
+            parameter:requiredParameter,
+            error: `You're missing a "${requiredParameter}" property.` 
+          }
+        );
     };
   };
 
@@ -134,18 +189,29 @@ app.post('/api/v1/palettes', (req, res) => {
     .insert(palette, 'id')
     .then(paletteId => {
       if (!paletteId) {
-        return res.status(404).json({
-          message:'New Palette ID was not returned from database, your submission may or may not have been successful.',
-        })
+        return res.status(404).json(
+          {
+            posted:false,
+            message:'New Palette ID was not returned from database, your submission may or may not have been successful.',
+          }
+        )
       }
-      res.status(201).json({ 
-        id: paletteId[0], 
-        name:palette.name,
-        message: 'New Palette creation successful' 
-      })
+      res.status(201).json(
+        { 
+          posted:true,
+          id: paletteId[0], 
+          name:palette.name,
+          message: 'New Palette creation successful' 
+        }
+      )
     })
     .catch(error => {
-      res.status(500).json({ error: error.message, stack: error.stack })
+      res.status(500).json(
+        { 
+          error: error.message, 
+          stack: error.stack 
+        }
+      )
     })
 })
 
@@ -159,9 +225,19 @@ app.patch('/api/v1/projects/:id', (req, res) => {
     .update({ ...updates })
     .then(projectId => {
       if (!projectId) {
-        return res.status(404).json({message:`Project ID# ${id} does not exist.`})
+        return res.status(404).json(
+          {
+            patched:false,
+            message:`Project ID# ${id} does not exist.`
+          }
+        )
       }
-      res.status(202).json({message:`Project ID# ${projectId} has been updated`})
+      res.status(202).json(
+        {
+          patched:true,
+          message:`Project ID# ${projectId} has been updated`
+        }
+      )
     })
     .catch(error => res.status(500).json(
       {
@@ -179,10 +255,20 @@ app.patch('/api/v1/palettes/:id', (req, res) => {
     .update({ ...updates })
     .then(paletteId => {
       if (!paletteId) {
-        return res.status(404).json({ message:`Palette ID# ${id}  does not exist.`
-        })
+        return res.status(404).json(
+          {
+            patched:false,
+            message:`Palette ID# ${id} does not exist.`
+          }
+        )
       }
-      res.status(202).json({message:`Palette ID# ${paletteId} has been updated`})
+      res.status(202).json(
+        {
+          patched: true,
+          ...id,
+          message:`Palette ID# ${paletteId} has been updated`
+        }
+      )
     })
     .catch(error => res.status(500).json(
       {
@@ -203,15 +289,17 @@ app.delete('/api/v1/projects/:id', (req, res) => {
       if(!projectID) {
         return res.status(404).json({
           deleted:false,
-          id,
+          ...id,
           message:`Project ID# ${id} does not exist.`
         })
       }
-      res.status(202).json({
-        deleted:true,
-        id,
-        message:`Project ID# ${id} has been deleted.`
-      })
+      res.status(202).json(
+        {
+          deleted:true,
+          ...id,
+          message:`Project ID# ${id} has been deleted.`
+        }
+      )
     })
     .catch(error => res.status(500).json(
       {
@@ -228,17 +316,21 @@ app.delete('/api/v1/palettes/:id', (req, res) => {
     .del()
     .then(paletteID => {
       if(!paletteID) {
-        return res.status(404).json({
-          deleted: false,
-          id,
-          message:`Palette ID# ${id} does not exist.`
-        })
+        return res.status(404).json(
+          {
+            deleted: false,
+            id,
+            message:`Palette ID# ${id} does not exist.`
+          }
+        )
       }
-      res.status(202).json({
-        deleted:true,
-        id,
-        message:`Palette ID# ${id} has been deleted.`
-      })
+      res.status(202).json(
+        {
+          deleted:true,
+          id,
+          message:`Palette ID# ${id} has been deleted.`
+        }
+      )
     })
     .catch(error => res.status(500).json(
       {
