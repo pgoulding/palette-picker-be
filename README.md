@@ -1,5 +1,17 @@
-# End Points for Server
+# Palette Picker Back End server
 
+
+
+[![Build Status](https://travis-ci.org/pgoulding/palette-picker-be.svg?branch=master)](https://travis-ci.org/pgoulding/palette-picker-be)
+
+[Palette Picker Front End](https://github.com/David5280/palette-picker-fe)
+
+[Deployed Server](https://pallete-picker-de-pg.herokuapp.com/)
+
+
+
+
+## End Points for Server
 | URL | VERB | OPTIONS | EXAMPLE RESPONSE | STATUS CODE |
 |----------------------|:------:|:--------------------------------------------------------------------------------------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
 | / | GET | N/A | text:"Palette Picker is running on port <port number>" | 200 (OK) |
